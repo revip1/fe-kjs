@@ -37,4 +37,5 @@ Route::get('/hps', [HpsController::class, 'index'])->name('hps.index');
 Route::get('/overview', [HpsController::class, 'overview'])->name('hps.overview');
 Route::get('/hps/create', [HpsController::class, 'create'])->name('hps.create');
 Route::post('/hps/store', [HpsController::class, 'store'])->name('hps.store');
+Route::get('/hps/{hpsHeader}', [HpsController::class, 'show'])->name('hps.show');
 

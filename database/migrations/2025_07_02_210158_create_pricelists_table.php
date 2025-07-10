@@ -17,7 +17,6 @@ class CreatePricelistsTable extends Migration
             $table->id();
             $table->foreignId('service_id')->constrained()->onDelete('cascade');
             $table->foreignId('hps_header_id')->constrained()->onDelete('cascade');
-            $table->string('nama');
             $table->integer('qty');
             $table->integer('jml_pemakaian');
             $table->integer('price');

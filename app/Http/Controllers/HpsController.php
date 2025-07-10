@@ -25,13 +25,19 @@ class HpsController extends Controller
 
     public function create()
     {
-        $services = Service::all(); // Fetch services for pricelist dropdown
+        $services = Service::all();
         return view('hps.create', compact('services'));
+    }
+
+    public function show(HpsHeader $hpsHeader)
+    {
+        $hpsHeader->load('pricelists.service');
+
+        return view('hps.show', compact('hpsHeader'));
     }
 
     public function store(Request $request)
     {
-        // Validasi HPS Header
         $validatedHeaderData = $request->validate([
             'cargo_name' => 'required|string|max:255',
             'consignee' => 'required|string|max:255',
@@ -44,11 +50,10 @@ class HpsController extends Controller
             'jam' => 'required|string|max:255',
         ]);
 
-        // Validasi semua data pricelist yang dikirim dalam array
+        
         $validatedPricelists = $request->validate([
             'pricelists' => 'required|array|min:1',
             'pricelists.*.service_id' => 'required|exists:services,id',
-            'pricelists.*.nama' => 'required|string|max:255',
             'pricelists.*.qty' => 'required|integer|min:1',
             'pricelists.*.jml_pemakaian' => 'required|integer|min:1',
             'pricelists.*.price' => 'required|numeric|min:0',
@@ -56,15 +61,14 @@ class HpsController extends Controller
             'pricelists.*.total' => 'required|numeric|min:0',
         ]);
 
-        // Simpan HPS Header ke database
+        
         $hpsHeader = HpsHeader::create($validatedHeaderData);
 
-        // Simpan masing-masing pricelist, dikaitkan ke HPS Header jika ada relasi
+        
         foreach ($request->pricelists as $item) {
             Pricelist::create([
                 'hps_header_id' => $hpsHeader->id,
                 'service_id' => $item['service_id'],
-                'nama' => $item['nama'],
                 'qty' => $item['qty'],
                 'jml_pemakaian' => $item['jml_pemakaian'],
                 'price' => $item['price'],
@@ -73,7 +77,7 @@ class HpsController extends Controller
             ]);
         }
 
-        return redirect()->route('hps.overview')->with('success', 'Data berhasil disimpan.');
+        return redirect()->route('hps.index')->with('success', 'Data berhasil disimpan.');
     }
 
 }

@@ -39,9 +39,9 @@
                         <td>{{ $header->shift }}</td>
                         <td>{{ $header->jam }}</td>
                         <td>
-                            <button class="btn btn-sm btn-info" type="button" data-bs-toggle="collapse" data-bs-target="#pricelist-{{ $header->id }}">
-                                Lihat Detail
-                            </button>
+                        <a href="{{ route('hps.show', $header->id) }}" class="btn btn-sm btn-info">
+                            Lihat Detail
+                        </a>
                         </td>
                     </tr>
                     <tr class="collapse" id="pricelist-{{ $header->id }}">
@@ -52,26 +52,24 @@
                                     <thead>
                                         <tr>
                                             <th>No</th>
-                                            <th>Nama</th>
+                                            <th>Nama Jasa</th>
                                             <th>Qty</th>
                                             <th>Jumlah Pemakaian</th>
                                             <th>Price</th>
                                             <th>Satuan</th>
                                             <th>Total</th>
-                                            <th>Service</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @forelse($header->pricelists as $i => $pl)
                                         <tr>
                                             <td>{{ $i + 1 }}</td>
-                                            <td>{{ $pl->nama }}</td>
+                                            <td>{{ $pl->service->nama ?? '-' }}</td>
                                             <td>{{ $pl->qty }}</td>
                                             <td>{{ $pl->jml_pemakaian }}</td>
                                             <td>{{ number_format($pl->price, 0, ',', '.') }}</td>
                                             <td>{{ $pl->satuan }}</td>
                                             <td>{{ number_format($pl->total, 0, ',', '.') }}</td>
-                                            <td>{{ $pl->service->nama ?? '-' }}</td>
                                         </tr>
                                         @empty
                                         <tr>

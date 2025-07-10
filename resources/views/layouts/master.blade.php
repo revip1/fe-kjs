@@ -73,15 +73,13 @@
       </div>
     </section>
   </div>
-  <!-- /.content-wrapper -->
-
+  
   <footer class="main-footer text-sm text-center">
     <strong>KJS © 2025</strong> | All rights reserved.
   </footer>
 </div>
 
 @yield('scripts')
-<!-- Scripts -->
 <script src="{{ asset('asset/plugins/jquery/jquery.min.js') }}"></script>
 <script src="{{ asset('asset/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 <script src="{{ asset('asset/dist/js/adminlte.min.js') }}"></script>

@@ -35,9 +35,9 @@
                         <td>{{ $header->shift }}</td>
                         <td>{{ $header->jam }}</td>
                         <td>
-                            <button class="btn btn-sm btn-info" type="button" data-bs-toggle="collapse" data-bs-target="#pricelist-{{ $header->id }}">
-                                Lihat Detail
-                            </button>
+                        <a href="{{ route('hps.show', $header->id) }}" class="btn btn-sm btn-info">
+                            Lihat Detail
+                        </a>
                         </td>
                     </tr>
                     <tr class="collapse" id="pricelist-{{ $header->id }}">
