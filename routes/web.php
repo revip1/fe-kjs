@@ -38,4 +38,7 @@ Route::get('/overview', [HpsController::class, 'overview'])->name('hps.overview'
 Route::get('/hps/create', [HpsController::class, 'create'])->name('hps.create');
 Route::post('/hps/store', [HpsController::class, 'store'])->name('hps.store');
 Route::get('/hps/{hpsHeader}', [HpsController::class, 'show'])->name('hps.show');
+Route::get('/hps/{hpsHeader}/edit', [HpsController::class, 'edit'])->name('hps.edit');
+Route::put('/hps/{hpsHeader}', [HpsController::class, 'update'])->name('hps.update');
+Route::delete('/hps/{hpsHeader}', [HpsController::class, 'destroy'])->name('hps.destroy');
 

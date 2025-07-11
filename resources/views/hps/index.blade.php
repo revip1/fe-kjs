@@ -42,6 +42,12 @@
                         <a href="{{ route('hps.show', $header->id) }}" class="btn btn-sm btn-info">
                             Lihat Detail
                         </a>
+                        <a href="{{route('hps.edit', $header->id) }}" class="btn btn-sm btn-warning">Edit</a>
+                        <form action="{{ route('hps.destroy', $header->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus data ini?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
+                        </form>
                         </td>
                     </tr>
                     <tr class="collapse" id="pricelist-{{ $header->id }}">

@@ -28,6 +28,10 @@
                 <input type="text" class="form-control form-control-sm" value="{{ $hpsHeader->jumlah_gang }}" readonly>
             </div>
             <div class="col-md-3 mb-3">
+                <label class="form-label">Ton/Gang/Day</label>
+                <input type="text" class="form-control form-control-sm" value="{{ $hpsHeader->tgd }}" readonly>
+            </div>
+            <div class="col-md-3 mb-3">
                 <label class="form-label">L/D Rate</label>
                 <input type="text" class="form-control form-control-sm" value="{{ $hpsHeader->ldrate }}" readonly>
             </div>
@@ -47,44 +51,101 @@
     </div>
 </div>
 
-<div class="card shadow-sm mb-4">
-    <div class="card-body">
-        <h2>Pricelist</h2>
+<form>
+    @csrf
 
-            @forelse($hpsHeader->pricelists as $index => $pricelist)
-        <div class="row mb-3 border p-3 rounded bg-light">
-            <div class="col-md-2 mb-3">
-                <label class="form-label">Jasa</label>
-                <input type="text" class="form-control form-control-sm" value="{{ $pricelist->service->nama ?? 'N/A' }}" readonly>
-            </div>
-            <div class="col-md-1 mb-3">
-                <label class="form-label">Quantity</label>
-                <input type="number" class="form-control form-control-sm" value="{{ $pricelist->qty }}" readonly>
-            </div>
-            <div class="col-md-2 mb-3">
-                <label class="form-label">Pemakaian</label>
-                <input type="number" class="form-control form-control-sm" value="{{ $pricelist->jml_pemakaian }}" readonly>
-            </div>
-            <div class="col-md-2 mb-3">
-                <label class="form-label">Tarif</label>
-                <input type="text" class="form-control form-control-sm" value="Rp {{ number_format($pricelist->price, 0, ',', '.') }}" readonly>
-            </div>
-            <div class="col-md-2 mb-3">
-                <label class="form-label">Satuan</label>
-                <input type="text" class="form-control form-control-sm" value="{{ $pricelist->satuan }}" readonly>
-            </div>
-            <div class="col-md-2 mb-3">
-                <label class="form-label">Total</label>
-                <input type="text" class="form-control form-control-sm" value="Rp {{ number_format($pricelist->total, 0, ',', '.') }}" readonly>
-            </div>
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h2>Pricelist</h2>
+
+            @if($hpsHeader->pricelists->isEmpty())
+                <div class="alert alert-warning">Tidak ada data pricelist.</div>
+            @else
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>No</th>
+                                <th>Nama Jasa</th>
+                                <th>Quantity</th>
+                                <th>Jumlah Pemakaian</th>
+                                <th>Tarif</th>
+                                <th>Satuan</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($hpsHeader->pricelists as $index => $pricelist)
+                                <tr>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm" value="{{ $pricelist->service->nama ?? 'N/A' }}" readonly>
+                                        <input type="hidden" name="pricelists[{{ $index }}][service_id]" value="{{ $pricelist->service_id }}">
+                                    </td>
+                                    <td>
+                                        <input type="number" name="pricelists[{{ $index }}][qty]" class="form-control form-control-sm" value="{{ $pricelist->qty }}" readonly>
+                                    </td>
+                                    <td>
+                                        <input type="number" name="pricelists[{{ $index }}][jml_pemakaian]" class="form-control form-control-sm" value="{{ $pricelist->jml_pemakaian }}" readonly>
+                                    </td>
+                                    <td>
+                                        <input type="text" name="pricelists[{{ $index }}][price]" class="form-control form-control-sm" value="{{ $pricelist->price }}" readonly>
+                                    </td>
+                                    <td>
+                                        <input type="text" name="pricelists[{{ $index }}][satuan]" class="form-control form-control-sm" value="{{ $pricelist->satuan }}" readonly>
+                                    </td>
+                                    <td>
+                                        <input type="text" name="pricelists[{{ $index }}][total]" class="form-control form-control-sm" value="{{ $pricelist->total }}" readonly>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-end">
+                    <button type="submit" class="btn btn-primary">Simpan Semua</button>
+                </div>
+            @endif
         </div>
-    @empty
-        <div class="alert alert-warning">Tidak ada data pricelist.</div>
-    @endforelse
+    </div>
+</form>
 
+
+    <div class="d-flex justify-content-end mt-4">
+    <div class="row w-100" style="max-width: 500px;">
+        <div class="col-md-6 mb-2">
+            <label class="form-label">Total</label>
+            <input type="text" class="form-control form-control-sm" value="{{ $hpsHeader->total }}" readonly>
+        </div>
+        <div class="col-md-6 mb-2">
+            <label class="form-label">PPH</label>
+            <input type="text" class="form-control form-control-sm" value="{{ $hpsHeader->pph }}" readonly>
+        </div>
+        <div class="col-md-6 mb-2">
+            <label class="form-label">Grand Total</label>
+            <input type="text" class="form-control form-control-sm" value="{{ $hpsHeader->grand_total }}" readonly>
+        </div>
+        <div class="col-md-6 mb-2">
+            <label class="form-label">Tarif/TON</label>
+            <input type="text" class="form-control form-control-sm" value="{{ $hpsHeader->tpton }}" readonly>
+        </div>
+        <div class="col-md-6 mb-2">
+            <label class="form-label">Margin 5%</label>
+            <input type="text" class="form-control form-control-sm" value="{{ $hpsHeader->mgn5 }}" readonly>
+        </div>
+        <div class="col-md-6 mb-2">
+            <label class="form-label">Margin 10%</label>
+            <input type="text" class="form-control form-control-sm" value="{{ $hpsHeader->mgn10 }}" readonly>
+        </div>  
+        <div class="col-md-6 mb-2">
+            <label class="form-label">Margin 15%</label>
+            <input type="text" class="form-control form-control-sm" value="{{ $hpsHeader->mgn15 }}" readonly>
+        </div>
+    </div>
+</div>
 
         <div class="mt-4">
-            <a href="{{ route('hps.index') }}" class="btn btn-secondary">Kembali ke Daftar HPS</a>
+            <a href="{{ route('hps.overview') }}" class="btn btn-secondary">Kembali ke Daftar HPS</a>
         </div>
     </div>
 </div>

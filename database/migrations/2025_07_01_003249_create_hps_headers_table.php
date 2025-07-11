@@ -23,7 +23,15 @@ class CreateHpsHeadersTable extends Migration
             $table->string('ldrate');
             $table->string('hari');
             $table->string('shift');
-            $table->string('jam');
+            $table->string('jam'); 
+            $table->string('tgd');
+            $table->integer('total');
+            $table->integer('pph');
+            $table->integer('grand_total');
+            $table->integer('tpton');
+            $table->integer('mgn5');
+            $table->integer('mgn10');
+            $table->integer('mgn15');
             $table->timestamps();
         });
     }

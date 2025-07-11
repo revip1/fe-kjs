@@ -16,9 +16,20 @@ class HpsController extends Controller
 
         return view('hps.index', compact('hpsHeaders'));
     }
-    public function overview()
+    public function overview(Request $request)
     {
-        $hpsHeaders = HpsHeader::with(['pricelists.service'])->get();
+        $query = HpsHeader::with(['pricelists.service']);
+
+        if ($request->has('search') && $request->search != '') {
+            $keyword = $request->search;
+            $query->where(function ($q) use ($keyword) {
+                $q->where('cargo_name', 'like', "%{$keyword}%")
+                ->orWhere('consignee', 'like', "%{$keyword}%")
+                ->orWhere('vessel_name', 'like', "%{$keyword}%");
+            });
+        }
+
+        $hpsHeaders = $query->get();
 
         return view('hps.overview', compact('hpsHeaders'));
     }
@@ -44,10 +55,18 @@ class HpsController extends Controller
             'vessel_name' => 'required|string|max:255',
             'tonase' => 'required|string|max:255',
             'jumlah_gang' => 'required|string|max:255',
+            'tgd' => 'required|numeric|max:255',
             'ldrate' => 'required|string|max:255',
             'hari' => 'required|string|max:255',
             'shift' => 'required|string|max:255',
             'jam' => 'required|string|max:255',
+            'total' => 'numeric|min:0',
+            'pph' => 'numeric|min:0',
+            'grand_total' => 'numeric|min:0',
+            'tpton' => 'numeric|min:0',
+            'mgn5' => 'numeric|min:0',
+            'mgn10' => 'numeric|min:0',
+            'mgn15' => 'numeric|min:0',
         ]);
 
         
@@ -79,5 +98,51 @@ class HpsController extends Controller
 
         return redirect()->route('hps.index')->with('success', 'Data berhasil disimpan.');
     }
+
+    public function edit(HpsHeader $hpsHeader)
+    {
+        $hpsHeader->load('pricelists.service');
+        $services = Service::all();
+
+        return view('hps.edit', compact('hpsHeader', 'services'));
+    }
+
+    public function update(Request $request, HpsHeader $hpsHeader)
+    {
+        $validatedHeaderData = $request->validate([
+            'cargo_name' => 'required|string|max:255',
+            'consignee' => 'required|string|max:255',
+            'vessel_name' => 'required|string|max:255',
+            'tonase' => 'required|string|max:255',
+            'jumlah_gang' => 'required|string|max:255',
+            'ldrate' => 'required|string|max:255',
+            'hari' => 'required|string|max:255',
+            'shift' => 'required|string|max:255',
+            'jam' => 'required|string|max:255',
+        ]);
+
+        $hpsHeader->update($validatedHeaderData);
+
+        foreach ($request->pricelists as $item) {
+            Pricelist::where('id', $item['id'])->update([
+                'qty' => $item['qty'],
+                'jml_pemakaian' => $item['jml_pemakaian'],
+                'price' => $item['price'],
+                'satuan' => $item['satuan'],
+                'total' => $item['total'],
+            ]);
+        }
+
+        return redirect()->route('hps.index')->with('success', 'Data berhasil diperbarui.');
+    }
+
+    public function destroy(HpsHeader $hpsHeader)
+    {
+        $hpsHeader->pricelists()->delete();
+        $hpsHeader->delete();
+
+        return redirect()->route('hps.index')->with('success', 'Data HPS berhasil dihapus.');
+    }
+
 
 }
