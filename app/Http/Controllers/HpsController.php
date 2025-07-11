@@ -148,14 +148,12 @@ class HpsController extends Controller
                 // Update HPS Header
                 $hpsHeader->update($validatedHeaderData);
 
-                // Get existing pricelist IDs for this HPS Header
                 $existingPricelistIds = $hpsHeader->pricelists->pluck('id')->toArray();
                 $submittedPricelistIds = [];
 
-                // Process submitted pricelists
                 foreach ($request->pricelists as $item) {
                     $pricelistData = [
-                        'hps_header_id' => $hpsHeader->id, // Ensure it's linked to the header
+                        'hps_header_id' => $hpsHeader->id,
                         'service_id' => $item['service_id'],
                         'qty' => $item['qty'],
                         'jml_pemakaian' => $item['jml_pemakaian'],
@@ -165,16 +163,13 @@ class HpsController extends Controller
                     ];
 
                     if (isset($item['id']) && $item['id']) {
-                        // This is an existing pricelist item, so update it
                         Pricelist::where('id', $item['id'])->update($pricelistData);
                         $submittedPricelistIds[] = $item['id'];
                     } else {
-                        // This is a new pricelist item, so create it
                         Pricelist::create($pricelistData);
                     }
                 }
 
-                // Delete pricelist items that were removed from the form
                 $pricelistsToDelete = array_diff($existingPricelistIds, $submittedPricelistIds);
                 if (!empty($pricelistsToDelete)) {
                     Pricelist::whereIn('id', $pricelistsToDelete)->delete();

@@ -231,10 +231,10 @@ document.addEventListener('DOMContentLoaded', function () {
             hari = tonase / ldrate;
             document.getElementById('hari').value = hari.toFixed(2);
 
-            shift = hari / 3; // Assuming 3 shifts per day
+            shift = hari / 3;
             document.getElementById('shift').value = shift.toFixed(2);
 
-            jam = shift * 21; // Assuming 21 hours per shift (3 shifts * 7 hours/shift or some other calculation)
+            jam = shift * 21; 
             document.getElementById('jam').value = jam.toFixed(2);
         } else {
             document.getElementById('ldrate').value = '';
