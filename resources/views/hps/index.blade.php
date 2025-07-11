@@ -22,9 +22,11 @@
                         <th>Cargo Name</th>
                         <th>Consignee</th>
                         <th>Vessel</th>
+                        <th>Ton/Gang/Day</th>
                         <th>Tonase</th>
-                        <th>Shift</th>
+                        <th>Hari</th>
                         <th>Jam</th>
+                        <th>Shift</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -36,8 +38,10 @@
                         <td>{{ $header->consignee }}</td>
                         <td>{{ $header->vessel_name }}</td>
                         <td>{{ $header->tonase }}</td>
-                        <td>{{ $header->shift }}</td>
+                        <td>{{ $header->tgd }}</td>
+                        <td>{{ $header->hari }}</td>
                         <td>{{ $header->jam }}</td>
+                        <td>{{ $header->shift }}</td>
                         <td>
                         <a href="{{ route('hps.show', $header->id) }}" class="btn btn-sm btn-info">
                             Lihat Detail

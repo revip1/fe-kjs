@@ -102,9 +102,6 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="text-end">
-                    <button type="submit" class="btn btn-primary">Simpan Semua</button>
-                </div>
             @endif
         </div>
     </div>

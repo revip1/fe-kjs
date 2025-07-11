@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\HpsHeader;
 use App\Models\Pricelist;
 use App\Models\Service;
+use Illuminate\Support\Facades\DB;
 
 class HpsController extends Controller
 {
@@ -108,33 +109,80 @@ class HpsController extends Controller
     }
 
     public function update(Request $request, HpsHeader $hpsHeader)
-    {
-        $validatedHeaderData = $request->validate([
-            'cargo_name' => 'required|string|max:255',
-            'consignee' => 'required|string|max:255',
-            'vessel_name' => 'required|string|max:255',
-            'tonase' => 'required|string|max:255',
-            'jumlah_gang' => 'required|string|max:255',
-            'ldrate' => 'required|string|max:255',
-            'hari' => 'required|string|max:255',
-            'shift' => 'required|string|max:255',
-            'jam' => 'required|string|max:255',
-        ]);
-
-        $hpsHeader->update($validatedHeaderData);
-
-        foreach ($request->pricelists as $item) {
-            Pricelist::where('id', $item['id'])->update([
-                'qty' => $item['qty'],
-                'jml_pemakaian' => $item['jml_pemakaian'],
-                'price' => $item['price'],
-                'satuan' => $item['satuan'],
-                'total' => $item['total'],
+        {
+            // 1. Validate Header Data
+            $validatedHeaderData = $request->validate([
+                'cargo_name' => 'required|string|max:255',
+                'consignee' => 'required|string|max:255',
+                'vessel_name' => 'required|string|max:255',
+                'tonase' => 'required|numeric',
+                'tgd' => 'required|numeric',
+                'jumlah_gang' => 'required|numeric', 
+                'ldrate' => 'required|numeric', 
+                'hari' => 'required|numeric', 
+                'shift' => 'required|numeric', 
+                'jam' => 'required|numeric', 
+                'total' => 'required|numeric', 
+                'pph' => 'required|numeric',
+                'grand_total' => 'required|numeric',
+                'tpton' => 'required|numeric',
+                'mgn5' => 'required|numeric',
+                'mgn10' => 'required|numeric',
+                'mgn15' => 'required|numeric',
             ]);
-        }
 
-        return redirect()->route('hps.index')->with('success', 'Data berhasil diperbarui.');
-    }
+            // 2. Validate Pricelist Data
+            $request->validate([
+                'pricelists' => 'required|array|min:1',
+                'pricelists.*.service_id' => 'required|exists:services,id', // Ensure service_id exists
+                'pricelists.*.qty' => 'required|numeric|min:1',
+                'pricelists.*.jml_pemakaian' => 'required|numeric|min:1',
+                'pricelists.*.price' => 'required|numeric',
+                'pricelists.*.satuan' => 'required|string|max:50',
+                'pricelists.*.total' => 'required|numeric',
+                'pricelists.*.id' => 'nullable|exists:pricelists,id', // 'id' is optional and must exist if provided
+            ]);
+
+            
+            DB::transaction(function () use ($request, $hpsHeader, $validatedHeaderData) {
+                // Update HPS Header
+                $hpsHeader->update($validatedHeaderData);
+
+                // Get existing pricelist IDs for this HPS Header
+                $existingPricelistIds = $hpsHeader->pricelists->pluck('id')->toArray();
+                $submittedPricelistIds = [];
+
+                // Process submitted pricelists
+                foreach ($request->pricelists as $item) {
+                    $pricelistData = [
+                        'hps_header_id' => $hpsHeader->id, // Ensure it's linked to the header
+                        'service_id' => $item['service_id'],
+                        'qty' => $item['qty'],
+                        'jml_pemakaian' => $item['jml_pemakaian'],
+                        'price' => $item['price'],
+                        'satuan' => $item['satuan'],
+                        'total' => $item['total'],
+                    ];
+
+                    if (isset($item['id']) && $item['id']) {
+                        // This is an existing pricelist item, so update it
+                        Pricelist::where('id', $item['id'])->update($pricelistData);
+                        $submittedPricelistIds[] = $item['id'];
+                    } else {
+                        // This is a new pricelist item, so create it
+                        Pricelist::create($pricelistData);
+                    }
+                }
+
+                // Delete pricelist items that were removed from the form
+                $pricelistsToDelete = array_diff($existingPricelistIds, $submittedPricelistIds);
+                if (!empty($pricelistsToDelete)) {
+                    Pricelist::whereIn('id', $pricelistsToDelete)->delete();
+                }
+            });
+
+            return redirect()->route('hps.index')->with('success', 'Data HPS berhasil diperbarui.');
+        }
 
     public function destroy(HpsHeader $hpsHeader)
     {
