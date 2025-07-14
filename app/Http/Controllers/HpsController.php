@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\HpsHeader;
 use App\Models\Pricelist;
 use App\Models\Service;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 
 class HpsController extends Controller
@@ -185,6 +186,16 @@ class HpsController extends Controller
         $hpsHeader->delete();
 
         return redirect()->route('hps.index')->with('success', 'Data HPS berhasil dihapus.');
+    }
+
+    public function exportPdf($id)
+    {
+        $hpsHeader = HpsHeader::with('pricelists.service')->findOrFail($id);
+        
+        $pdf = Pdf::loadView('hps.pdf', compact('hpsHeader'))
+                ->setPaper('a4', 'portrait');
+
+        return $pdf->stream('HPS_'.$hpsHeader->cargo_name.'.pdf');
     }
 
 

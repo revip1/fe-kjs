@@ -41,4 +41,5 @@ Route::get('/hps/{hpsHeader}', [HpsController::class, 'show'])->name('hps.show')
 Route::get('/hps/{hpsHeader}/edit', [HpsController::class, 'edit'])->name('hps.edit');
 Route::put('/hps/{hpsHeader}', [HpsController::class, 'update'])->name('hps.update');
 Route::delete('/hps/{hpsHeader}', [HpsController::class, 'destroy'])->name('hps.destroy');
+Route::get('/hps/{id}/pdf', [HpsController::class, 'exportPdf'])->name('hps.pdf');
 

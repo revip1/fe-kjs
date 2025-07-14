@@ -51,6 +51,9 @@
                         <a href="{{ route('hps.show', $header->id) }}" class="btn btn-sm btn-info">
                             Lihat Detail
                         </a>
+                        <a href="{{ route('hps.pdf', $header->id) }}" class="btn btn-sm btn-danger" target="_blank">
+                        Export PDF
+                        </a>
                         </td>
                     </tr>
                     <tr class="collapse" id="pricelist-{{ $header->id }}">
