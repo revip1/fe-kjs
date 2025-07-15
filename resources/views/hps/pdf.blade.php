@@ -51,7 +51,7 @@
             padding: 2px 5px;
             border: 1px solid #000;
             text-align: left;
-            border:none
+            border:none;
         }
 
         .deal {
@@ -102,19 +102,32 @@
         table.pricelist {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 40px;
-            font-size: 14px;
-            clear: both;
+            font-size: 13px;
+            margin-top: 30px;
         }
 
-        table.pricelist th, table.pricelist td {
-            border: 1px solid #999;
-            padding: 10px;
+        table.pricelist th,
+        table.pricelist td {
+            border: 1px solid #666;
+            padding: 8px;
+            vertical-align: middle;
         }
 
         table.pricelist thead {
-            background-color: #eee;
+            background-color: #d9e1f2;
+            font-weight: bold;
+            text-align: center;
         }
+
+        table.pricelist tfoot {
+            font-weight: bold;
+        }
+
+        table.pricelist tfoot td {
+            border: 1px solid #666;
+            padding: 8px;
+        }
+
 
         .summary-table {
             width: 320px;
@@ -169,7 +182,7 @@
         <table class="tarif-header">
             <tr class="hps">
                 <th>TARIF HPS</th>
-                <td>{{ ($hpsHeader->tpton) }}</td>
+                <td style="font-weight: bold;">{{ ($hpsHeader->tpton) }}</td>
             </tr>
         </table>
 
@@ -179,15 +192,23 @@
 
         <div class="hari-shift-jam">
             <div class="row">
-                <span class="value">{{ ($hpsHeader->hari) }}</span>
+                <span class="value">
+                    {{ fmod($hpsHeader->hari, 1) == 0 ? $hpsHeader->hari : number_format($hpsHeader->hari, 2) }}
+                </span>
                 <span class="label">HARI</span>
             </div>
+
             <div class="row">
-                <span class="value">{{ ($hpsHeader->shift) }}</span>
+                <span class="value">
+                    {{ fmod($hpsHeader->shift, 1) == 0 ? $hpsHeader->shift : number_format($hpsHeader->shift, 2) }}
+                </span>
                 <span class="label">SHIFT</span>
             </div>
+
             <div class="row">
-            <span class="value">{{ ($hpsHeader->jam) }}</span>
+                <span class="value">
+                    {{ fmod($hpsHeader->jam, 1) == 0 ? $hpsHeader->jam : number_format($hpsHeader->jam, 2) }}
+                </span>
                 <span class="label">JAM</span>
             </div>
         </div>
@@ -195,8 +216,6 @@
 
     <div style="clear: both;"></div>
 
-    <!-- Pricelist -->
-    <h3>Pricelist</h3>
     <table class="pricelist">
         <thead>
             <tr>
@@ -212,45 +231,56 @@
         <tbody>
             @foreach($hpsHeader->pricelists as $index => $pl)
                 <tr>
-                    <td>{{ $index + 1 }}</td>
+                    <td style="text-align: center;">{{ $index + 1 }}</td>
                     <td>{{ $pl->service->nama ?? 'N/A' }}</td>
-                    <td>{{ $pl->qty }}</td>
-                    <td>{{ $pl->jml_pemakaian }}</td>
-                    <td>{{ number_format($pl->price, 0, ',', '.') }}</td>
-                    <td>{{ $pl->satuan }}</td>
-                    <td>{{ number_format($pl->total, 0, ',', '.') }}</td>
+                    <td style="text-align: right;">{{ $pl->qty }}</td>
+                    <td style="text-align: right;">{{ $pl->jml_pemakaian }}</td>
+                    <td style="text-align: right;">{{ number_format($pl->price, 0, ',', '.') }}</td>
+                    <td style="text-align: center;">{{ $pl->satuan }}</td>
+                    <td style="text-align: right;">{{ number_format($pl->total, 0, ',', '.') }}</td>
                 </tr>
             @endforeach
         </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="5" style="border: none;"></td>
+                <td style="text-align: center; font-weight: bold; background-color: #f2f2f2;">Total</td>
+                <td style="text-align: right; background-color: #f2f2f2;">Rp{{ number_format($hpsHeader->total, 0, ',', '.') }}</td>
+            </tr>
+            <tr>
+                <td colspan="5" style="border: none;"></td>
+                <td style="text-align: center; font-weight: bold; background-color: #f2f2f2;">PPH (2%)</td>
+                <td style="text-align: right; background-color: #f2f2f2;">Rp{{ number_format($hpsHeader->pph, 0, ',', '.') }}</td>
+            </tr>
+            <tr>
+                <td colspan="5" style="border: none;"></td>
+                <td style="text-align: center; font-weight: bold; background-color: #f2f2f2;">Grand Total</td>
+                <td style="text-align: right; background-color: #f2f2f2;">Rp{{ number_format($hpsHeader->grand_total, 0, ',', '.') }}</td>
+            </tr>
+            <tr>
+                <td colspan="5" style="border: none;"></td>
+                <td style="text-align: center; font-weight: bold; background-color: #f2f2f2;">Tarif/TON</td>
+                <td style="text-align: right; background-color: #f2f2f2;">Rp{{ number_format($hpsHeader->tpton, 0, ',', '.') }}</td>
+            </tr>
+            <tr>
+                <td colspan="5" style="border: none;"></td>
+                <td style="text-align: center; font-weight: bold; background-color: #f2f2f2;">Margin 5%</td>
+                <td style="text-align: right; background-color: #f2f2f2;">Rp{{ number_format($hpsHeader->mgn5, 0, ',', '.') }}</td>
+            </tr>
+            <tr>
+                <td colspan="5" style="border: none;"></td>
+                <td style="text-align: center; font-weight: bold; background-color: #f2f2f2;">Margin 10%</td>
+                <td style="text-align: right; background-color: #f2f2f2;">Rp{{ number_format($hpsHeader->mgn10, 0, ',', '.') }}</td>
+            </tr>
+            <tr>
+                <td colspan="5" style="border: none;"></td>
+                <td style="text-align: center; font-weight: bold; background-color: #f2f2f2;">Margin 15%</td>
+                <td style="text-align: right; background-color: #f2f2f2;">Rp{{ number_format($hpsHeader->mgn15, 0, ',', '.') }}</td>
+            </tr>
+        </tfoot>
+
     </table>
 
-    {{-- SUMMARY --}}
-    <table class="summary-table">
-        <tr>
-            <th>Total</th>
-            <td>Rp{{ number_format($hpsHeader->total, 0, ',', '.') }}</td>
-        </tr>
-        <tr>
-            <th>PPH (2%)</th>
-            <td>Rp{{ number_format($hpsHeader->pph, 0, ',', '.') }}</td>
-        </tr>
-        <tr>
-            <th>Grand Total</th>
-            <td>Rp{{ number_format($hpsHeader->grand_total, 0, ',', '.') }}</td>
-        </tr>
-        <tr>
-            <th>Margin 5%</th>
-            <td>Rp{{ number_format($hpsHeader->mgn5, 0, ',', '.') }}</td>
-        </tr>
-        <tr>
-            <th>Margin 10%</th>
-            <td>Rp{{ number_format($hpsHeader->mgn10, 0, ',', '.') }}</td>
-        </tr>
-        <tr>
-            <th>Margin 15%</th>
-            <td>Rp{{ number_format($hpsHeader->mgn15, 0, ',', '.') }}</td>
-        </tr>
-    </table>
 
 </body>
 </html>
