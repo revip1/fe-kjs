@@ -38,15 +38,15 @@
                 <tbody>
                     @foreach($hpsHeaders as $index => $header)
                     <tr>
-                        <td>{{ $index + 1 }}</td>
+                        <td>{{ $loop->iteration + ($hpsHeaders->currentPage() - 1) * $hpsHeaders->perPage() }}</td>
                         <td>{{ $header->cargo_name }}</td>
                         <td>{{ $header->consignee }}</td>
                         <td>{{ $header->vessel_name }}</td>
                         <td>{{ number_format($header->tonase, 0, ',', '.') }}</td>
-                        <td>{{ number_format($header->tgd, 2, ',', '.') }}</td>
-                        <td>{{ number_format($header->hari, 2, ',', '.') }}</td>
-                        <td>{{ number_format($header->jam, 2, ',', '.') }}</td>
-                        <td>{{ number_format($header->shift, 2, ',', '.') }}</td>
+                        <td>{{ fmod($header->tgd, 1) == 0 ? $header->tgd : number_format($header->tgd, 2) }}</td>
+                        <td>{{ fmod($header->hari, 1) == 0 ? $header->hari : number_format($header->hari, 2) }}</td>
+                        <td>{{ fmod($header->jam, 1) == 0 ? $header->jam : number_format($header->jam, 2) }}</td>
+                        <td>{{ fmod($header->shift, 1) == 0 ? $header->shift : number_format($header->shift, 2) }}</td>
                         <td>
                             <a href="{{ route('hps.show', $header->id) }}" class="btn btn-sm btn-info mb-1">
                                 Detail
@@ -60,8 +60,14 @@
                 </tbody>
             </table>
         </div>
+        
+            <div class="d-flex justify-content-end">
+                {{ $hpsHeaders->links('vendor.pagination.bootstrap-4') }}
+        </div>
     </div>
 </div>
+
+
 @endsection
 
 @section('scripts')

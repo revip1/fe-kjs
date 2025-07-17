@@ -8,9 +8,22 @@ use App\Models\Category;
 
 class ServiceController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $services = Service::with('category')->get();
+        $query = Service::with('category');
+    
+        if ($request->has('search') && $request->search != '') {
+            $keyword = $request->search;
+            $query->where(function ($q) use ($keyword) {
+                $q->where('nama', 'like', "%{$keyword}%")
+                  ->orWhereHas('category', function ($q) use ($keyword) {
+                      $q->where('nama', 'like', "%{$keyword}%");
+                  });
+            });
+        }
+    
+        $services = $query->paginate(5)->appends($request->all());
+    
         return view('services.index', compact('services'));
     }
     

@@ -11,9 +11,21 @@
 
     <div class="card shadow-sm">
         <div class="card-body">
-            <h2 class="mb-3">Daftar HPS</h2>
-            <a href="{{ route('hps.create') }}" class="btn btn-primary mb-3">Tambah HPS</a>
+            {{-- Header dengan judul, tombol tambah, dan search bar --}}
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <h2 class="mb-2">Daftar HPS</h2>
+                    <a href="{{ route('hps.create') }}" class="btn btn-primary">Tambah HPS</a>
+                </div>
+                <form method="GET" action="{{ route('hps.index') }}" style="max-width: 250px; width: 100%;">
+                    <div class="input-group">
+                        <input type="text" name="search" class="form-control me-3" placeholder="Cari HPS" value="{{ request('search') }}">
+                        <button type="submit" class="btn btn-primary">Cari</button>
+                    </div>
+                </form>
+            </div>
 
+            {{-- Table data HPS --}}
             <table class="table table-bordered text-center align-middle table-hover">
                 <thead class="table-light">
                     <tr>
@@ -32,7 +44,7 @@
                 <tbody>
                     @foreach($hpsHeaders as $index => $header)
                     <tr>
-                        <td>{{ $index + 1 }}</td>
+                        <td>{{ ($hpsHeaders->currentPage() - 1) * $hpsHeaders->perPage() + $loop->iteration }}</td>
                         <td>{{ $header->cargo_name }}</td>
                         <td>{{ $header->consignee }}</td>
                         <td>{{ $header->vessel_name }}</td>
@@ -42,7 +54,7 @@
                         <td>{{ number_format($header->jam, 3, ',', '.') }}</td>
                         <td>{{ number_format($header->shift, 3, ',', '.') }}</td>
                         <td>
-                            <div class="d-flex gap-1">
+                            <div class="d-flex gap-1 justify-content-center">
                                 <a href="{{ route('hps.show', $header->id) }}" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="Lihat Detail">
                                     <i class="fas fa-eye"></i>
                                 </a>
@@ -58,10 +70,9 @@
                                 </form>
                             </div>
                         </td>
-
                     </tr>
 
-                    {{-- Baris Collapse untuk Pricelist --}}
+                    {{-- Collapse baris pricelist --}}
                     <tr class="collapse" id="pricelist-{{ $header->id }}">
                         <td colspan="10">
                             <div class="card card-body">
@@ -103,18 +114,21 @@
                 </tbody>
             </table>
         </div>
+        <div class="d-flex justify-content-end me-3 mb-3">
+            {{ $hpsHeaders->links('vendor.pagination.bootstrap-4') }}
+        </div>
     </div>
 </div>
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
     document.addEventListener("DOMContentLoaded", function(){
-        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
-        })
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
     });
 </script>
-
 @endsection

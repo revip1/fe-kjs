@@ -2,9 +2,8 @@
 
 @section('content')
 <div class="container">
-    <div class="card shadow-sm" style="width: 100%; max-width: 600px;">
+    <div class="card shadow-sm" style="width: 100%; max-width: 1000px;">
         <div class="card-body">
-            <h1>Daftar Kategori</h1>
             
             @if(session('success'))
                 <div class="alert alert-success">{{ session('success') }}</div>
@@ -17,7 +16,19 @@
                 </div>
             @endif
 
-            <a href="{{ route('categories.create') }}" class="btn btn-primary mb-3">Tambah Kategori</a>
+            <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap">
+                <div class="mb-2">
+                    <h2 class="mb-2">Daftar Kategori</h2>
+                    <a href="{{ route('categories.create') }}" class="btn btn-primary">Tambah Kategori</a>
+                </div>
+                <form method="GET" action="{{ route('categories.index') }}" style="max-width: 250px; width: 100%;">
+                    <div class="input-group">
+                        <input type="text" name="search" class="form-control me-3" placeholder="Cari Kategori" value="{{ request('search') }}">
+                        <button type="submit" class="btn btn-primary">Cari</button>
+                    </div>
+                </form>
+            </div>
+
 
             <table class="table table-bordered">
                 <thead>
@@ -30,7 +41,7 @@
                 <tbody>
                     @foreach($categories as $index => $category)
                     <tr>
-                        <td>{{ $index + 1 }}</td>
+                        <td>{{ $loop->iteration + ($categories->currentPage() - 1) * $categories->perPage() }}</td>
                         <td>{{ $category->nama }}</td>
                         <td>
                             <a href="{{ route('categories.edit', $category) }}" class="btn btn-sm btn-warning">Edit</a>
@@ -44,6 +55,9 @@
                     @endforeach
                 </tbody>
             </table>
+        </div>
+        <div class="d-flex justify-content-end">
+                {{ $categories->links('vendor.pagination.bootstrap-4') }}
         </div>
     </div>
 </div>

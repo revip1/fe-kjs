@@ -12,29 +12,50 @@ use Illuminate\Support\Facades\DB;
 class HpsController extends Controller
 {
 
-    public function index()
-    {
-        $hpsHeaders = HpsHeader::with(['pricelists.service'])->get();
-
-        return view('hps.index', compact('hpsHeaders'));
-    }
-    public function overview(Request $request)
+    public function index(Request $request)
     {
         $query = HpsHeader::with(['pricelists.service']);
-
+    
         if ($request->has('search') && $request->search != '') {
             $keyword = $request->search;
             $query->where(function ($q) use ($keyword) {
                 $q->where('cargo_name', 'like', "%{$keyword}%")
-                ->orWhere('consignee', 'like', "%{$keyword}%")
-                ->orWhere('vessel_name', 'like', "%{$keyword}%");
+                  ->orWhere('consignee', 'like', "%{$keyword}%")
+                  ->orWhere('vessel_name', 'like', "%{$keyword}%")
+                  ->orWhere('tonase', 'like', "%{$keyword}%")
+                    ->orWhere('jumlah_gang', 'like', "%{$keyword}%")
+                    ->orWhere('tgd', 'like', "%{$keyword}%")
+                    ->orWhere('ldrate', 'like', "%{$keyword}%")
+                    ->orWhere('hari', 'like', "%{$keyword}%")
+                    ->orWhere('shift', 'like', "%{$keyword}%")
+                    ->orWhere('jam', 'like', "%{$keyword}%")
+                    ->orWhere('total', 'like', "%{$keyword}%");
             });
         }
-
-        $hpsHeaders = $query->get();
-
+    
+        $hpsHeaders = $query->paginate(5)->appends($request->all()); // tetap bawa query string saat paginasi
+    
+        return view('hps.index', compact('hpsHeaders'));
+    }
+    
+    public function overview(Request $request)
+    {
+        $query = HpsHeader::with(['pricelists.service']);
+    
+        if ($request->has('search') && $request->search != '') {
+            $keyword = $request->search;
+            $query->where(function ($q) use ($keyword) {
+                $q->where('cargo_name', 'like', "%{$keyword}%")
+                  ->orWhere('consignee', 'like', "%{$keyword}%")
+                  ->orWhere('vessel_name', 'like', "%{$keyword}%");
+            });
+        }
+    
+        $hpsHeaders = $query->paginate(5)->appends($request->all()); // tetap bawa query string saat paginasi
+    
         return view('hps.overview', compact('hpsHeaders'));
     }
+    
 
     public function create()
     {

@@ -2,10 +2,21 @@
 
 @section('content')
 <div class="container">
-    <div class="card shadow-sm" style="width: 100%; max-width: 600px;">
+    <div class="card shadow-sm" style="width: 100%; max-width: 1000px;">
         <div class="card-body">
-            <h2>Daftar Jasa</h2>
-            <a href="{{ route('services.create') }}" class="btn btn-primary mb-3">Tambah Jasa</a>
+            <!-- Search Bar Judul -->
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <h2 class="mb-2">Daftar Jasa</h2>
+                    <a href="{{ route('services.create') }}" class="btn btn-primary">Tambah Jasa</a>
+                </div>
+                <form method="GET" action="{{ route('services.index') }}" style="max-width: 250px; width: 100%;">
+                    <div class="input-group">
+                        <input type="text" name="search" class="form-control me-3" placeholder="Cari Jasa" value="{{ request('search') }}">
+                        <button type="submit" class="btn btn-primary">Cari</button>
+                    </div>
+                </form>
+            </div>
 
             @if(session('success'))
                 <div class="alert alert-success">{{ session('success') }}</div>
@@ -39,6 +50,9 @@
                     @endforeach
                 </tbody>
             </table>
+        </div>
+        <div class="d-flex justify-content-end">
+                {{ $services->links('vendor.pagination.bootstrap-4') }}
         </div>
     </div>
 </div>
