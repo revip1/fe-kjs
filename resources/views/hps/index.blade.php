@@ -50,9 +50,10 @@
                         <td>{{ $header->vessel_name }}</td>
                         <td>{{ $header->tgd }}</td>
                         <td>{{ $header->tonase }}</td>
-                        <td>{{ number_format($header->hari, 3, ',', '.') }}</td>
-                        <td>{{ number_format($header->jam, 3, ',', '.') }}</td>
-                        <td>{{ number_format($header->shift, 3, ',', '.') }}</td>
+                        <td>{{ fmod($header->hari, 1) == 0 ? number_format($header->hari, 0, ',', '.') : number_format($header->hari, 3, ',', '.') }}</td>
+                        <td>{{ fmod($header->jam, 1) == 0 ? number_format($header->jam, 0, ',', '.') : number_format($header->jam, 3, ',', '.') }}</td>
+                        <td>{{ fmod($header->shift, 1) == 0 ? number_format($header->shift, 0, ',', '.') : number_format($header->shift, 3, ',', '.') }}</td>
+
                         <td>
                             <div class="d-flex gap-1 justify-content-center">
                                 <a href="{{ route('hps.show', $header->id) }}" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="Lihat Detail">

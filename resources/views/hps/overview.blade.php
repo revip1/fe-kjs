@@ -43,10 +43,11 @@
                         <td>{{ $header->consignee }}</td>
                         <td>{{ $header->vessel_name }}</td>
                         <td>{{ number_format($header->tonase, 0, ',', '.') }}</td>
-                        <td>{{ fmod($header->tgd, 1) == 0 ? $header->tgd : number_format($header->tgd, 2) }}</td>
-                        <td>{{ fmod($header->hari, 1) == 0 ? $header->hari : number_format($header->hari, 2) }}</td>
-                        <td>{{ fmod($header->jam, 1) == 0 ? $header->jam : number_format($header->jam, 2) }}</td>
-                        <td>{{ fmod($header->shift, 1) == 0 ? $header->shift : number_format($header->shift, 2) }}</td>
+                        <td>{{ fmod($header->tgd, 1) == 0 ? number_format($header->tgd, 0, ',', '.') : number_format($header->tgd, 2, ',', '.') }}</td>
+                        <td>{{ fmod($header->hari, 1) == 0 ? number_format($header->hari, 0, ',', '.') : number_format($header->hari, 2, ',', '.') }}</td>
+                        <td>{{ fmod($header->jam, 1) == 0 ? number_format($header->jam, 0, ',', '.') : number_format($header->jam, 2, ',', '.') }}</td>
+                        <td>{{ fmod($header->shift, 1) == 0 ? number_format($header->shift, 0, ',', '.') : number_format($header->shift, 2, ',', '.') }}</td>
+
                         <td>
                             <a href="{{ route('hps.show', $header->id) }}" class="btn btn-sm btn-info mb-1">
                                 Detail

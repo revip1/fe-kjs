@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container d-flex mt-4">
-    <div class="card shadow-sm" style="width: 100%; max-width: 600px;">
+    <div class="card shadow-sm" style="width: 100%; max-width: 1000px;">
         <div class="card-body">
             <h1 class="mb-4">Edit Kategori</h1>
 
