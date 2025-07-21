@@ -21,15 +21,7 @@ class HpsController extends Controller
             $query->where(function ($q) use ($keyword) {
                 $q->where('cargo_name', 'like', "%{$keyword}%")
                   ->orWhere('consignee', 'like', "%{$keyword}%")
-                  ->orWhere('vessel_name', 'like', "%{$keyword}%")
-                  ->orWhere('tonase', 'like', "%{$keyword}%")
-                    ->orWhere('jumlah_gang', 'like', "%{$keyword}%")
-                    ->orWhere('tgd', 'like', "%{$keyword}%")
-                    ->orWhere('ldrate', 'like', "%{$keyword}%")
-                    ->orWhere('hari', 'like', "%{$keyword}%")
-                    ->orWhere('shift', 'like', "%{$keyword}%")
-                    ->orWhere('jam', 'like', "%{$keyword}%")
-                    ->orWhere('total', 'like', "%{$keyword}%");
+                  ->orWhere('vessel_name', 'like', "%{$keyword}%");
             });
         }
     

@@ -35,7 +35,7 @@
                 <tbody>
                     @foreach($services as $service)
                     <tr>
-                        <td>{{ $loop->iteration }}</td>
+                        <td>{{ $loop->iteration + ($services->currentPage() - 1) * $services->perPage() }}</td>
                         <td>{{ $service->nama }}</td>
                         <td>{{ $service->category->nama }}</td>
                         <td>Rp {{ number_format($service->harga) }}</td>
