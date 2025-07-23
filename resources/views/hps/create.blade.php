@@ -4,6 +4,7 @@
 <div class="container">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+    {{ -- Show success alert if available -- }}
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('success') }}

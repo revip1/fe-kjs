@@ -2,9 +2,11 @@
 
 @section('content')
 <div class="container">
+    {{-- Card utama --}}
     <div class="card shadow-sm" style="width: 100%; max-width: 1000px;">
         <div class="card-body">
-            
+
+            {{-- Flash message --}}
             @if(session('success'))
                 <div class="alert alert-success">{{ session('success') }}</div>
             @endif
@@ -16,6 +18,7 @@
                 </div>
             @endif
 
+            {{-- Header: title, tombol tambah, dan search bar --}}
             <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap">
                 <div class="mb-2">
                     <h2 class="mb-2">Daftar Kategori</h2>
@@ -29,9 +32,9 @@
                 </form>
             </div>
 
-
-            <table class="table table-bordered">
-                <thead>
+            {{-- Tabel kategori --}}
+            <table class="table table-bordered table-hover align-middle text-center">
+                <thead class="table-light">
                     <tr>
                         <th>#</th>
                         <th>Nama Kategori</th>
@@ -39,25 +42,37 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($categories as $index => $category)
+                    @forelse($categories as $index => $category)
                     <tr>
-                        <td>{{ $loop->iteration + ($categories->currentPage() - 1) * $categories->perPage() }}</td>
+                        <td>{{ ($categories->currentPage() - 1) * $categories->perPage() + $loop->iteration }}</td>
                         <td>{{ $category->nama }}</td>
                         <td>
-                            <a href="{{ route('categories.edit', $category) }}" class="btn btn-sm btn-warning">Edit</a>
-                            <form action="{{ route('categories.destroy', $category) }}" method="POST" style="display:inline;">
-                                @csrf
-                                @method('DELETE')
-                                <button onclick="return confirm('Yakin hapus?')" class="btn btn-sm btn-danger">Hapus</button>
-                            </form>
+                            <div class="d-flex justify-content-center gap-1 flex-wrap">
+                                <a href="{{ route('categories.edit', $category) }}" class="btn btn-sm btn-warning" title="Edit Kategori">
+                                    <i class="fas fa-pen"></i>
+                                </a>
+                                <form action="{{ route('categories.destroy', $category) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus kategori ini?')" style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-sm btn-danger" title="Hapus">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
-                    @endforeach
+                    @empty
+                    <tr>
+                        <td colspan="3" class="text-muted">Belum ada kategori yang ditambahkan.</td>
+                    </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
-        <div class="d-flex justify-content-end">
-                {{ $categories->links('vendor.pagination.bootstrap-4') }}
+
+        {{-- Pagination --}}
+        <div class="d-flex justify-content-end p-3">
+            {{ $categories->links('vendor.pagination.bootstrap-4') }}
         </div>
     </div>
 </div>

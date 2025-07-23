@@ -2,8 +2,10 @@
 
 @section('content')
 <div class="container">
+    {{-- CSRF token untuk proteksi keamanan form --}}
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+    {{-- Menampilkan alert jika update berhasil --}}
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('success') }}
@@ -11,6 +13,7 @@
         </div>
     @endif
 
+    {{-- Menampilkan daftar error validasi --}}
     @if($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <ul>
@@ -22,49 +25,61 @@
         </div>
     @endif
 
+    {{-- Form untuk mengedit data HPS --}}
     <form action="{{ route('hps.update', $hpsHeader->id) }}" method="POST" id="mainHpsForm">
         @csrf
         @method('PUT')
 
+        {{-- Section: HPS Header --}}
         <div class="card shadow-sm mb-4">
             <div class="card-header"><h2 class="mb-0">HPS Header</h2></div>
             <div class="card-body row">
+                {{-- Nama Cargo --}}
                 <div class="col-md-3 mb-3">
                     <label for="cargo_name">Nama Cargo</label>
                     <input type="text" name="cargo_name" id="cargo_name" class="form-control form-control-sm" value="{{ old('cargo_name', $hpsHeader->cargo_name) }}" required>
                 </div>
+                {{-- Consignee --}}
                 <div class="col-md-3 mb-3">
                     <label for="consignee">Consignee</label>
                     <input type="text" name="consignee" id="consignee" class="form-control form-control-sm" value="{{ old('consignee', $hpsHeader->consignee) }}" required>
                 </div>
+                {{-- Nama Kapal --}}
                 <div class="col-md-3 mb-3">
                     <label for="vessel_name">Vessel Name</label>
                     <input type="text" name="vessel_name" id="vessel_name" class="form-control form-control-sm" value="{{ old('vessel_name', $hpsHeader->vessel_name) }}" required>
                 </div>
+                {{-- Tonase --}}
                 <div class="col-md-3 mb-3">
                     <label for="tonase">Tonase</label>
                     <input type="number" name="tonase" id="tonase" class="form-control form-control-sm" value="{{ old('tonase', $hpsHeader->tonase) }}" required>
                 </div>
+                {{-- TGD (Ton/Gang/Day) --}}
                 <div class="col-md-3 mb-3">
                     <label for="tgd" class="form-label">Ton/Gang/Day</label>
                     <input type="number" name="tgd" id="tgd" class="form-control form-control-sm" value="{{ old('tgd', $hpsHeader->tgd) }}" required>
                 </div>
+                {{-- Jumlah Gang --}}
                 <div class="col-md-3 mb-3">
                     <label for="jumlah_gang" class="form-label">Jumlah Gang</label>
                     <input type="number" name="jumlah_gang" id="jumlah_gang" class="form-control form-control-sm" value="{{ old('jumlah_gang', $hpsHeader->jumlah_gang) }}" required>
                 </div>
+                {{-- L/D Rate (readonly) --}}
                 <div class="col-md-3 mb-3">
                     <label for="ldrate" class="form-label">L/D Rate</label>
                     <input type="text" name="ldrate" id="ldrate" class="form-control form-control-sm" value="{{ old('ldrate', $hpsHeader->ldrate) }}" required readonly>
                 </div>
+                {{-- Hari estimasi kerja --}}
                 <div class="col-md-3 mb-3">
                     <label for="hari" class="form-label">Hari</label>
                     <input type="text" name="hari" id="hari" class="form-control form-control-sm" value="{{ old('hari', $hpsHeader->hari) }}" required readonly>
                 </div>
+                {{-- Shift total --}}
                 <div class="col-md-3 mb-3">
                     <label for="shift" class="form-label">Shift</label>
                     <input type="text" name="shift" id="shift" class="form-control form-control-sm" value="{{ old('shift', $hpsHeader->shift) }}" required readonly>
                 </div>
+                {{-- Total jam --}}
                 <div class="col-md-3 mb-3">
                     <label for="jam" class="form-label">Jam</label>
                     <input type="text" name="jam" id="jam" class="form-control form-control-sm" value="{{ old('jam', $hpsHeader->jam) }}" required readonly>
@@ -72,12 +87,17 @@
             </div>
         </div>
 
+        {{-- Section: Pricelist --}}
         <div class="card shadow-sm mb-4">
             <div class="card-header"><h2 class="mb-0">Pricelist</h2></div>
             <div class="card-body" id="pricelistContainer">
+                {{-- Loop setiap item pricelist --}}
                 @forelse($hpsHeader->pricelists as $index => $pricelist)
                 <div class="row align-items-end mb-3 pricelist-item" id="pricelist-item-{{ $index }}">
+                    {{-- Hidden input untuk ID Pricelist --}}
                     <input type="hidden" name="pricelists[{{ $index }}][id]" value="{{ $pricelist->id }}">
+
+                    {{-- Select Jasa --}}
                     <div class="col-md-2 mb-3">
                         <label for="service_id_{{ $index }}">Jasa</label>
                         <select name="pricelists[{{ $index }}][service_id]" id="service_id_{{ $index }}" class="form-control form-control-sm service-select" required>
@@ -87,18 +107,26 @@
                             @endforeach
                         </select>
                     </div>
+
+                    {{-- Qty --}}
                     <div class="col-md-1 mb-3">
                         <label for="qty_{{ $index }}">Qty</label>
                         <input type="number" name="pricelists[{{ $index }}][qty]" id="qty_{{ $index }}" class="form-control form-control-sm qty-input" value="{{ old('pricelists.' . $index . '.qty', $pricelist->qty) }}" required min="1">
                     </div>
+
+                    {{-- Jumlah Pemakaian --}}
                     <div class="col-md-2 mb-3">
                         <label for="jml_pemakaian_{{ $index }}">Jumlah</label>
                         <input type="number" name="pricelists[{{ $index }}][jml_pemakaian]" id="jml_pemakaian_{{ $index }}" class="form-control form-control-sm jml-pemakaian-input" value="{{ old('pricelists.' . $index . '.jml_pemakaian', $pricelist->jml_pemakaian) }}" required min="1">
                     </div>
+
+                    {{-- Harga per unit --}}
                     <div class="col-md-2 mb-3">
                         <label for="price_{{ $index }}">Tarif</label>
                         <input type="number" name="pricelists[{{ $index }}][price]" id="price_{{ $index }}" class="form-control form-control-sm price-input" value="{{ old('pricelists.' . $index . '.price', $pricelist->price) }}" readonly>
                     </div>
+
+                    {{-- Pilihan Satuan --}}
                     <div class="col-md-2 mb-3">
                         <label for="satuan_{{ $index }}" class="form-label">Satuan</label>
                         <select name="pricelists[{{ $index }}][satuan]" id="satuan_{{ $index }}" class="form-control form-control-sm" required>
@@ -112,65 +140,27 @@
                             <option value="unit" {{ $pricelist->satuan == 'unit' ? 'selected' : '' }}>Unit</option>
                         </select>
                     </div>
+
+                    {{-- Total harga --}}
                     <div class="col-md-2 mb-3">
                         <label for="total_{{ $index }}">Total</label>
                         <input type="number" name="pricelists[{{ $index }}][total]" id="total_{{ $index }}" class="form-control form-control-sm total-input" value="{{ old('pricelists.' . $index . '.total', $pricelist->total) }}" readonly>
                     </div>
+
+                    {{-- Tombol tambah dan hapus baris pricelist --}}
                     <div class="col-md-1 d-flex align-items-end">
                         <button type="button" class="btn btn-success btn-sm add-pricelist-item me-1">+</button>
                         <button type="button" class="btn btn-danger btn-sm remove-pricelist-item">-</button>
                     </div>
                 </div>
                 @empty
-                {{-- This block will be shown if there are no existing pricelists --}}
-                <div class="row align-items-end mb-3 pricelist-item" id="pricelist-item-0">
-                    <div class="col-md-2 mb-3">
-                        <label for="service_id_0">Jasa</label>
-                        <select name="pricelists[0][service_id]" id="service_id_0" class="form-control form-control-sm service-select" required>
-                            <option value="">Pilih Jasa</option>
-                            @foreach($services as $service)
-                                <option value="{{ $service->id }}" data-harga="{{ $service->harga }}">{{ $service->nama }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-1 mb-3">
-                        <label for="qty_0">Qty</label>
-                        <input type="number" name="pricelists[0][qty]" id="qty_0" class="form-control form-control-sm qty-input" required min="1">
-                    </div>
-                    <div class="col-md-2 mb-3">
-                        <label for="jml_pemakaian_0">Jumlah</label>
-                        <input type="number" name="pricelists[0][jml_pemakaian]" id="jml_pemakaian_0" class="form-control form-control-sm jml-pemakaian-input" required min="1">
-                    </div>
-                    <div class="col-md-2 mb-3">
-                        <label for="price_0">Tarif</label>
-                        <input type="number" name="pricelists[0][price]" id="price_0" class="form-control form-control-sm price-input" readonly>
-                    </div>
-                    <div class="col-md-2 mb-3">
-                        <label for="satuan_0" class="form-label">Satuan</label>
-                        <select name="pricelists[0][satuan]" id="satuan_0" class="form-control form-control-sm" required>
-                            <option value="ltr">Liter</option>
-                            <option value="shift">Shift</option>
-                            <option value="gang">Gang</option>
-                            <option value="paket">Paket</option>
-                            <option value="kapal">Kapal</option>
-                            <option value="jam">Jam</option>
-                            <option value="ton">Ton</option>
-                            <option value="unit">Unit</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2 mb-3">
-                        <label for="total_0">Total</label>
-                        <input type="number" name="pricelists[0][total]" id="total_0" class="form-control form-control-sm total-input" readonly>
-                    </div>
-                    <div class="col-md-1 d-flex align-items-end">
-                        <button type="button" class="btn btn-success btn-sm add-pricelist-item me-1">+</button>
-                        <button type="button" class="btn btn-danger btn-sm remove-pricelist-item" style="display: none;">-</button>
-                    </div>
-                </div>
+                {{-- Jika tidak ada data pricelist, tampilkan form kosong pertama --}}
                 @endforelse
             </div>
         </div>
 
+
+        {{-- Summary Fields --}}
         <div class="d-flex justify-content-end mt-4">
             <div class="row w-100" style="max-width: 500px;">
                 <div class="col-md-6 mb-2">
@@ -210,7 +200,6 @@
     </form>
 </div>
 @endsection
-
 @section('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {

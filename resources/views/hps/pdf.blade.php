@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Export PDF HPS</title>
+
+    {{-- Style untuk tampilan PDF --}}
     <style>
         body {
             font-family: 'Helvetica', sans-serif;
@@ -10,6 +12,7 @@
             padding: 40px;
         }
 
+        /* Tabel informasi header (atas) */
         table.header-table {
             width: 100%;
             font-size: 12px;
@@ -62,6 +65,7 @@
             text-align: right;
         }
 
+        /* Tabel pricelist/detail jasa */
         table.pricelist {
             width: 100%;
             border-collapse: collapse;
@@ -92,8 +96,10 @@
         }
     </style>
 </head>
+
 <body>
 
+    {{-- Informasi utama HPS --}}
     <table class="header-table">
         <tr>
             <td class="label">CARGO NAME</td>
@@ -113,20 +119,27 @@
         <tr>
             <td class="label">TONASE</td>
             <td class="value">: {{ $hpsHeader->tonase }} Ton</td>
-            <td class="text-center value">{{fmod($hpsHeader->hari, 1) == 0 ? $hpsHeader->hari : number_format($hpsHeader->hari, 2) }} HARI</td>
+            <td class="text-center value">
+                {{ fmod($hpsHeader->hari, 1) == 0 ? $hpsHeader->hari : number_format($hpsHeader->hari, 2) }} HARI
+            </td>
         </tr>
         <tr>
             <td class="label">JUMLAH GANG</td>
             <td class="value">: {{ $hpsHeader->jumlah_gang }} GANG</td>
-            <td class="text-center value">{{fmod($hpsHeader->shift, 1) == 0 ? $hpsHeader->shift : number_format($hpsHeader->shift, 2) }} SHIFT</td>
+            <td class="text-center value">
+                {{ fmod($hpsHeader->shift, 1) == 0 ? $hpsHeader->shift : number_format($hpsHeader->shift, 2) }} SHIFT
+            </td>
         </tr>
         <tr>
             <td class="label">L/D RATE</td>
             <td class="value">: {{ $hpsHeader->ldrate }} TON/DAY</td>
-            <td class="text-center value">{{fmod($hpsHeader->jam, 1) == 0 ? $hpsHeader->jam : number_format($hpsHeader->jam, 2) }} JAM</td>
+            <td class="text-center value">
+                {{ fmod($hpsHeader->jam, 1) == 0 ? $hpsHeader->jam : number_format($hpsHeader->jam, 2) }} JAM
+            </td>
         </tr>
     </table>
 
+    {{-- Tabel daftar jasa dan rincian harga --}}
     <table class="pricelist">
         <thead>
             <tr>
@@ -152,41 +165,59 @@
                 </tr>
             @endforeach
         </tbody>
+
+        {{-- Ringkasan akhir total HPS --}}
         <tfoot>
             <tr>
                 <td colspan="5" style="border: none;"></td>
                 <td class="text-center" style="background-color: #f2f2f2;">Total</td>
-                <td class="text-right" style="background-color: #f2f2f2;">Rp{{ number_format($hpsHeader->total, 0, ',', '.') }}</td>
+                <td class="text-right" style="background-color: #f2f2f2;">
+                    Rp{{ number_format($hpsHeader->total, 0, ',', '.') }}
+                </td>
             </tr>
             <tr>
                 <td colspan="5" style="border: none;"></td>
                 <td class="text-center" style="background-color: #f2f2f2;">PPH (2%)</td>
-                <td class="text-right" style="background-color: #f2f2f2;">Rp{{ number_format($hpsHeader->pph, 0, ',', '.') }}</td>
+                <td class="text-right" style="background-color: #f2f2f2;">
+                    Rp{{ number_format($hpsHeader->pph, 0, ',', '.') }}
+                </td>
             </tr>
             <tr>
                 <td colspan="5" style="border: none;"></td>
                 <td class="text-center" style="background-color: #f2f2f2;">Grand Total</td>
-                <td class="text-right" style="background-color: #f2f2f2;">Rp{{ number_format($hpsHeader->grand_total, 0, ',', '.') }}</td>
+                <td class="text-right" style="background-color: #f2f2f2;">
+                    Rp{{ number_format($hpsHeader->grand_total, 0, ',', '.') }}
+                </td>
             </tr>
             <tr>
                 <td colspan="5" style="border: none;"></td>
                 <td class="text-center" style="background-color: #f2f2f2;">Tarif/TON</td>
-                <td class="text-right" style="background-color: #f2f2f2;">Rp{{ number_format($hpsHeader->tpton, 0, ',', '.') }}</td>
+                <td class="text-right" style="background-color: #f2f2f2;">
+                    Rp{{ number_format($hpsHeader->tpton, 0, ',', '.') }}
+                </td>
             </tr>
+
+            {{-- Margin tambahan untuk analisis harga alternatif --}}
             <tr>
                 <td colspan="5" style="border: none;"></td>
                 <td class="text-center" style="background-color: #f2f2f2;">Margin 5%</td>
-                <td class="text-right" style="background-color: #f2f2f2;">Rp{{ number_format($hpsHeader->mgn5, 0, ',', '.') }}</td>
+                <td class="text-right" style="background-color: #f2f2f2;">
+                    Rp{{ number_format($hpsHeader->mgn5, 0, ',', '.') }}
+                </td>
             </tr>
             <tr>
                 <td colspan="5" style="border: none;"></td>
                 <td class="text-center" style="background-color: #f2f2f2;">Margin 10%</td>
-                <td class="text-right" style="background-color: #f2f2f2;">Rp{{ number_format($hpsHeader->mgn10, 0, ',', '.') }}</td>
+                <td class="text-right" style="background-color: #f2f2f2;">
+                    Rp{{ number_format($hpsHeader->mgn10, 0, ',', '.') }}
+                </td>
             </tr>
             <tr>
                 <td colspan="5" style="border: none;"></td>
                 <td class="text-center" style="background-color: #f2f2f2;">Margin 15%</td>
-                <td class="text-right" style="background-color: #f2f2f2;">Rp{{ number_format($hpsHeader->mgn15, 0, ',', '.') }}</td>
+                <td class="text-right" style="background-color: #f2f2f2;">
+                    Rp{{ number_format($hpsHeader->mgn15, 0, ',', '.') }}
+                </td>
             </tr>
         </tfoot>
     </table>

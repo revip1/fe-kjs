@@ -2,6 +2,7 @@
 
 @section('content')
 <div class="container">
+    {{-- Success alert, muncul setelah aksi seperti tambah/edit/delete --}}
     @if(session('success'))
     <div class="alert alert-success alert-dismissible fade show" role="alert">
         {{ session('success') }}
@@ -9,14 +10,18 @@
     </div>
     @endif
 
+    {{-- Main card for HPS list --}}
     <div class="card shadow-sm">
         <div class="card-body">
-            {{-- Header dengan judul, tombol tambah, dan search bar --}}
+
+            {{-- Header section: Title, "Tambah" button, dan search --}}
             <div class="d-flex justify-content-between align-items-start mb-3">
                 <div>
                     <h2 class="mb-2">Daftar HPS</h2>
                     <a href="{{ route('hps.create') }}" class="btn btn-primary">Tambah HPS</a>
                 </div>
+
+                {{-- Simple search input --}}
                 <form method="GET" action="{{ route('hps.index') }}" style="max-width: 250px; width: 100%;">
                     <div class="input-group">
                         <input type="text" name="search" class="form-control me-3" placeholder="Cari HPS" value="{{ request('search') }}">
@@ -25,7 +30,7 @@
                 </form>
             </div>
 
-            {{-- Table data HPS --}}
+            {{-- Tabel data utama HPS --}}
             <table class="table table-bordered text-center align-middle table-hover">
                 <thead class="table-light">
                     <tr>
@@ -50,10 +55,13 @@
                         <td>{{ $header->vessel_name }}</td>
                         <td>{{ $header->tgd }}</td>
                         <td>{{ $header->tonase }}</td>
+
+                        {{-- Format angka dengan 3 desimal jika ada koma --}}
                         <td>{{ fmod($header->hari, 1) == 0 ? number_format($header->hari, 0, ',', '.') : number_format($header->hari, 3, ',', '.') }}</td>
                         <td>{{ fmod($header->jam, 1) == 0 ? number_format($header->jam, 0, ',', '.') : number_format($header->jam, 3, ',', '.') }}</td>
                         <td>{{ fmod($header->shift, 1) == 0 ? number_format($header->shift, 0, ',', '.') : number_format($header->shift, 3, ',', '.') }}</td>
 
+                        {{-- Action buttons (icon only, with tooltip) --}}
                         <td>
                             <div class="d-flex gap-1 justify-content-center">
                                 <a href="{{ route('hps.show', $header->id) }}" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="Lihat Detail">
@@ -73,7 +81,7 @@
                         </td>
                     </tr>
 
-                    {{-- Collapse baris pricelist --}}
+                    {{-- Optional: Collapsible row for detailed pricelist --}}
                     <tr class="collapse" id="pricelist-{{ $header->id }}">
                         <td colspan="10">
                             <div class="card card-body">
@@ -115,6 +123,8 @@
                 </tbody>
             </table>
         </div>
+
+        {{-- Pagination --}}
         <div class="d-flex justify-content-end me-3 mb-3">
             {{ $hpsHeaders->links('vendor.pagination.bootstrap-4') }}
         </div>
@@ -123,6 +133,7 @@
 @endsection
 
 @section('scripts')
+{{-- Bootstrap JS dan tooltip init --}}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function(){

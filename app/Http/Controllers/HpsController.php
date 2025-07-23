@@ -11,11 +11,14 @@ use Illuminate\Support\Facades\DB;
 
 class HpsController extends Controller
 {
-
+    /**
+     * Menampilkan daftar HPS dengan paginasi dan fitur pencarian.
+     */
     public function index(Request $request)
     {
         $query = HpsHeader::with(['pricelists.service']);
-    
+
+        // Filter berdasarkan keyword jika tersedia
         if ($request->has('search') && $request->search != '') {
             $keyword = $request->search;
             $query->where(function ($q) use ($keyword) {
@@ -24,16 +27,21 @@ class HpsController extends Controller
                   ->orWhere('vessel_name', 'like', "%{$keyword}%");
             });
         }
-    
-        $hpsHeaders = $query->paginate(5)->appends($request->all()); // tetap bawa query string saat paginasi
-    
+
+        // Ambil data dengan paginasi (5 per halaman)
+        $hpsHeaders = $query->paginate(5)->appends($request->all());
+
         return view('hps.index', compact('hpsHeaders'));
     }
-    
+
+    /**
+     * Menampilkan overview HPS di halaman berbeda (overview).
+     * Fungsi serupa dengan index().
+     */
     public function overview(Request $request)
     {
         $query = HpsHeader::with(['pricelists.service']);
-    
+
         if ($request->has('search') && $request->search != '') {
             $keyword = $request->search;
             $query->where(function ($q) use ($keyword) {
@@ -42,28 +50,36 @@ class HpsController extends Controller
                   ->orWhere('vessel_name', 'like', "%{$keyword}%");
             });
         }
-    
-        $hpsHeaders = $query->paginate(5)->appends($request->all()); // tetap bawa query string saat paginasi
-    
+
+        $hpsHeaders = $query->paginate(5)->appends($request->all());
+
         return view('hps.overview', compact('hpsHeaders'));
     }
-    
 
+    /**
+     * Menampilkan form untuk membuat data HPS baru.
+     */
     public function create()
     {
         $services = Service::all();
         return view('hps.create', compact('services'));
     }
 
+    /**
+     * Menampilkan detail satu data HPS.
+     */
     public function show(HpsHeader $hpsHeader)
     {
         $hpsHeader->load('pricelists.service');
-
         return view('hps.show', compact('hpsHeader'));
     }
 
+    /**
+     * Menyimpan data HPS dan daftar pricelist ke database.
+     */
     public function store(Request $request)
     {
+        // Validasi data header
         $validatedHeaderData = $request->validate([
             'cargo_name' => 'required|string|max:255',
             'consignee' => 'required|string|max:255',
@@ -84,7 +100,7 @@ class HpsController extends Controller
             'mgn15' => 'numeric|min:0',
         ]);
 
-        
+        // Validasi daftar pricelist
         $validatedPricelists = $request->validate([
             'pricelists' => 'required|array|min:1',
             'pricelists.*.service_id' => 'required|exists:services,id',
@@ -95,10 +111,10 @@ class HpsController extends Controller
             'pricelists.*.total' => 'required|numeric|min:0',
         ]);
 
-        
+        // Simpan HPS header
         $hpsHeader = HpsHeader::create($validatedHeaderData);
 
-        
+        // Simpan tiap item pricelist
         foreach ($request->pricelists as $item) {
             Pricelist::create([
                 'hps_header_id' => $hpsHeader->id,
@@ -114,6 +130,9 @@ class HpsController extends Controller
         return redirect()->route('hps.index')->with('success', 'Data berhasil disimpan.');
     }
 
+    /**
+     * Menampilkan form edit HPS dan datanya.
+     */
     public function edit(HpsHeader $hpsHeader)
     {
         $hpsHeader->load('pricelists.service');
@@ -122,77 +141,86 @@ class HpsController extends Controller
         return view('hps.edit', compact('hpsHeader', 'services'));
     }
 
+    /**
+     * Memperbarui data HPS dan pricelist yang terkait.
+     */
     public function update(Request $request, HpsHeader $hpsHeader)
-        {
-            // 1. Validate Header Data
-            $validatedHeaderData = $request->validate([
-                'cargo_name' => 'required|string|max:255',
-                'consignee' => 'required|string|max:255',
-                'vessel_name' => 'required|string|max:255',
-                'tonase' => 'required|numeric',
-                'tgd' => 'required|numeric',
-                'jumlah_gang' => 'required|numeric', 
-                'ldrate' => 'required|numeric', 
-                'hari' => 'required|numeric', 
-                'shift' => 'required|numeric', 
-                'jam' => 'required|numeric', 
-                'total' => 'required|numeric', 
-                'pph' => 'required|numeric',
-                'grand_total' => 'required|numeric',
-                'tpton' => 'required|numeric',
-                'mgn5' => 'required|numeric',
-                'mgn10' => 'required|numeric',
-                'mgn15' => 'required|numeric',
-            ]);
+    {
+        // Validasi header HPS
+        $validatedHeaderData = $request->validate([
+            'cargo_name' => 'required|string|max:255',
+            'consignee' => 'required|string|max:255',
+            'vessel_name' => 'required|string|max:255',
+            'tonase' => 'required|numeric',
+            'tgd' => 'required|numeric',
+            'jumlah_gang' => 'required|numeric',
+            'ldrate' => 'required|numeric',
+            'hari' => 'required|numeric',
+            'shift' => 'required|numeric',
+            'jam' => 'required|numeric',
+            'total' => 'required|numeric',
+            'pph' => 'required|numeric',
+            'grand_total' => 'required|numeric',
+            'tpton' => 'required|numeric',
+            'mgn5' => 'required|numeric',
+            'mgn10' => 'required|numeric',
+            'mgn15' => 'required|numeric',
+        ]);
 
-            // 2. Validate Pricelist Data
-            $request->validate([
-                'pricelists' => 'required|array|min:1',
-                'pricelists.*.service_id' => 'required|exists:services,id', // Ensure service_id exists
-                'pricelists.*.qty' => 'required|numeric|min:1',
-                'pricelists.*.jml_pemakaian' => 'required|numeric|min:1',
-                'pricelists.*.price' => 'required|numeric',
-                'pricelists.*.satuan' => 'required|string|max:50',
-                'pricelists.*.total' => 'required|numeric',
-                'pricelists.*.id' => 'nullable|exists:pricelists,id', // 'id' is optional and must exist if provided
-            ]);
+        // Validasi pricelist yang dikirim dari form
+        $request->validate([
+            'pricelists' => 'required|array|min:1',
+            'pricelists.*.service_id' => 'required|exists:services,id',
+            'pricelists.*.qty' => 'required|numeric|min:1',
+            'pricelists.*.jml_pemakaian' => 'required|numeric|min:1',
+            'pricelists.*.price' => 'required|numeric',
+            'pricelists.*.satuan' => 'required|string|max:50',
+            'pricelists.*.total' => 'required|numeric',
+            'pricelists.*.id' => 'nullable|exists:pricelists,id',
+        ]);
 
-            
-            DB::transaction(function () use ($request, $hpsHeader, $validatedHeaderData) {
-                // Update HPS Header
-                $hpsHeader->update($validatedHeaderData);
+        // Jalankan pembaruan dalam transaksi
+        DB::transaction(function () use ($request, $hpsHeader, $validatedHeaderData) {
+            // Update data header
+            $hpsHeader->update($validatedHeaderData);
 
-                $existingPricelistIds = $hpsHeader->pricelists->pluck('id')->toArray();
-                $submittedPricelistIds = [];
+            // Ambil ID pricelist yang lama
+            $existingPricelistIds = $hpsHeader->pricelists->pluck('id')->toArray();
+            $submittedPricelistIds = [];
 
-                foreach ($request->pricelists as $item) {
-                    $pricelistData = [
-                        'hps_header_id' => $hpsHeader->id,
-                        'service_id' => $item['service_id'],
-                        'qty' => $item['qty'],
-                        'jml_pemakaian' => $item['jml_pemakaian'],
-                        'price' => $item['price'],
-                        'satuan' => $item['satuan'],
-                        'total' => $item['total'],
-                    ];
+            foreach ($request->pricelists as $item) {
+                $pricelistData = [
+                    'hps_header_id' => $hpsHeader->id,
+                    'service_id' => $item['service_id'],
+                    'qty' => $item['qty'],
+                    'jml_pemakaian' => $item['jml_pemakaian'],
+                    'price' => $item['price'],
+                    'satuan' => $item['satuan'],
+                    'total' => $item['total'],
+                ];
 
-                    if (isset($item['id']) && $item['id']) {
-                        Pricelist::where('id', $item['id'])->update($pricelistData);
-                        $submittedPricelistIds[] = $item['id'];
-                    } else {
-                        Pricelist::create($pricelistData);
-                    }
+                // Update jika ada ID, kalau tidak maka create
+                if (isset($item['id']) && $item['id']) {
+                    Pricelist::where('id', $item['id'])->update($pricelistData);
+                    $submittedPricelistIds[] = $item['id'];
+                } else {
+                    Pricelist::create($pricelistData);
                 }
+            }
 
-                $pricelistsToDelete = array_diff($existingPricelistIds, $submittedPricelistIds);
-                if (!empty($pricelistsToDelete)) {
-                    Pricelist::whereIn('id', $pricelistsToDelete)->delete();
-                }
-            });
+            // Hapus pricelist yang tidak dikirim kembali
+            $pricelistsToDelete = array_diff($existingPricelistIds, $submittedPricelistIds);
+            if (!empty($pricelistsToDelete)) {
+                Pricelist::whereIn('id', $pricelistsToDelete)->delete();
+            }
+        });
 
-            return redirect()->route('hps.index')->with('success', 'Data HPS berhasil diperbarui.');
-        }
+        return redirect()->route('hps.index')->with('success', 'Data HPS berhasil diperbarui.');
+    }
 
+    /**
+     * Menghapus data HPS beserta seluruh pricelist-nya.
+     */
     public function destroy(HpsHeader $hpsHeader)
     {
         $hpsHeader->pricelists()->delete();
@@ -201,15 +229,16 @@ class HpsController extends Controller
         return redirect()->route('hps.index')->with('success', 'Data HPS berhasil dihapus.');
     }
 
+    /**
+     * Mengekspor data HPS tertentu ke dalam format PDF.
+     */
     public function exportPdf($id)
     {
         $hpsHeader = HpsHeader::with('pricelists.service')->findOrFail($id);
-        
+
         $pdf = Pdf::loadView('hps.pdf', compact('hpsHeader'))
                 ->setPaper('a4', 'portrait');
 
         return $pdf->stream('HPS_'.$hpsHeader->cargo_name.'.pdf');
     }
-
-
 }
